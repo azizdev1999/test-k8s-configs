@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jupyter-hub
+  namespace: ml-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jupyter-hub
+  template:
+    metadata:
+      labels:
+        app: jupyter-hub
+    spec:
+      containers:
+      - name: jupyter-hub-server
+        image: jupyterhub/jupyterhub:3.0
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 8000
+          name: hub
+        env:
+        - name: JUPYTERHUB_CRYPT_KEY
+          valueFrom:
+            secretKeyRef:
+              name: jupyter-secret
+              key: crypt-key
+      - name: notebook-spawner
+        image: jupyter/tensorflow-notebook:latest
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+        ports:
+        - containerPort: 8888
+          name: notebook
+      - name: model-server
+        image: tensorflow/serving:latest
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 8501
+          name: rest-api
+        - containerPort: 8500
+          name: grpc-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jupyter-hub-service
+  namespace: ml-platform
+spec:
+  selector:
+    app: jupyter-hub
+  ports:
+  - name: hub
+    port: 8000
+    targetPort: 8000
+  - name: notebook
+    port: 8888
+    targetPort: 8888

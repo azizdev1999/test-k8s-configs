@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: vault
+  namespace: security
+spec:
+  serviceName: vault-service
+  replicas: 3
+  selector:
+    matchLabels:
+      app: vault
+  template:
+    metadata:
+      labels:
+        app: vault
+    spec:
+      containers:
+      - name: vault-server
+        image: hashicorp/vault:1.12.0
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8200
+          name: vault-port
+        - containerPort: 8201
+          name: cluster-port
+        env:
+        - name: VAULT_ADDR
+          value: "http://127.0.0.1:8200"
+        - name: VAULT_API_ADDR
+          value: "http://$(POD_IP):8200"
+        - name: VAULT_CLUSTER_ADDR
+          value: "https://$(POD_IP):8201"
+        volumeMounts:
+        - name: vault-data
+          mountPath: /vault/data
+        - name: vault-config
+          mountPath: /vault/config
+        securityContext:
+          capabilities:
+            add:
+              - IPC_LOCK
+      - name: vault-agent
+        image: hashicorp/vault:1.12.0
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+        command: ["vault", "agent", "-config=/vault/agent/config.hcl"]
+        volumeMounts:
+        - name: vault-agent-config
+          mountPath: /vault/agent
+      volumes:
+      - name: vault-config
+        configMap:
+          name: vault-config
+      - name: vault-agent-config
+        configMap:
+          name: vault-agent-config
+  volumeClaimTemplates:
+  - metadata:
+      name: vault-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Gi
