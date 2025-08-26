@@ -31,3 +31,20 @@ spec:
           value: "medium"
         - name: ENVIRONMENT
           value: "production"
+      - name: cpu-stress-mem-100p
+        image: pebble/cpu-stress:v2.0.0
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "1000m"
+          limits:
+            memory: "1024Mi"
+            cpu: "2000m"
+        ports:
+        - containerPort: 8081
+          name: http-high
+        env:
+        - name: STRESS_LEVEL
+          value: "high"
+        - name: ENVIRONMENT
+          value: "production"
