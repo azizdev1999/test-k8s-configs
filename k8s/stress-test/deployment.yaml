@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stress-test-deployment
+  namespace: pebble
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: stress-test
+  template:
+    metadata:
+      labels:
+        app: stress-test
+    spec:
+      containers:
+      - name: cpu-stress-mem-50p
+        image: pebble/stress-test:v1.0.0
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        env:
+        - name: STRESS_TYPE
+          value: "cpu-memory"
+      - name: stress-worker
+        image: pebble/stress-worker:v1.0.0
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
