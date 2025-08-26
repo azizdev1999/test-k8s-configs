@@ -18,8 +18,8 @@ spec:
         image: stress:latest
         resources:
           requests:
-            memory: "512Mi"
+            memory: "32Mi"
             cpu: "1"
           limits:
-            memory: "1Gi"
+            memory: "32Mi"
             cpu: "2"
