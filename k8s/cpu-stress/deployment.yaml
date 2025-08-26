@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cpu-stress-deployment
+  namespace: pebble
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cpu-stress
+  template:
+    metadata:
+      labels:
+        app: cpu-stress
+    spec:
+      containers:
+      - name: cpu-stress-mem-50p
+        image: pebble/cpu-stress:v1.0.0
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
+          limits:
+            memory: "512Mi"
+            cpu: "1000m"
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: STRESS_LEVEL
+          value: "medium"
+        - name: ENVIRONMENT
+          value: "production"
