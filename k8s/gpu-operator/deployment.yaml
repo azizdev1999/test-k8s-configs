@@ -1,0 +1,164 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gpu-operator
+  namespace: gpu-operator-system
+  labels:
+    app: gpu-operator
+    app.kubernetes.io/name: gpu-operator
+    app.kubernetes.io/component: controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gpu-operator
+      app.kubernetes.io/name: gpu-operator
+  template:
+    metadata:
+      labels:
+        app: gpu-operator
+        app.kubernetes.io/name: gpu-operator
+        app.kubernetes.io/component: controller
+    spec:
+      serviceAccountName: gpu-operator
+      containers:
+      - name: gpu-operator
+        image: nvcr.io/nvidia/gpu-operator:v23.9.1
+        imagePullPolicy: IfNotPresent
+        command:
+        - gpu-operator
+        env:
+        - name: OPERATOR_NAME
+          value: "gpu-operator"
+        - name: WATCH_NAMESPACE
+          value: ""
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        volumeMounts:
+        - name: host-os-release
+          mountPath: /host-etc/os-release
+          readOnly: true
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+      volumes:
+      - name: host-os-release
+        hostPath:
+          path: /etc/os-release
+          type: File
+      nodeSelector:
+        kubernetes.io/os: linux
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        operator: Equal
+        value: ""
+        effect: NoSchedule
+      - key: node-role.kubernetes.io/control-plane
+        operator: Equal
+        value: ""
+        effect: NoSchedule
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gpu-operator-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: gpu-operator
+  namespace: gpu-operator-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: gpu-operator
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  - nodes/status
+  - pods
+  - pods/eviction
+  - services
+  - endpoints
+  - persistentvolumeclaims
+  - events
+  - configmaps
+  - secrets
+  verbs:
+  - '*'
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  - daemonsets
+  - replicasets
+  - statefulsets
+  verbs:
+  - '*'
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  - cronjobs
+  verbs:
+  - '*'
+- apiGroups:
+  - nvidia.com
+  resources:
+  - '*'
+  verbs:
+  - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: gpu-operator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: gpu-operator
+subjects:
+- kind: ServiceAccount
+  name: gpu-operator
+  namespace: gpu-operator-system
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gpu-operator-metrics
+  namespace: gpu-operator-system
+  labels:
+    app: gpu-operator
+spec:
+  selector:
+    app: gpu-operator
+  ports:
+  - name: metrics
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  type: ClusterIP
