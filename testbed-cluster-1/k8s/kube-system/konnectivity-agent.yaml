@@ -18,8 +18,8 @@ spec:
         image: k8s.gcr.io/kas-network-proxy/proxy-agent:v0.0.33
         resources:
           requests:
-            memory: "64Mi"
-            cpu: "50m"
+            memory: "30Mi"
+            cpu: "40m"
           limits:
-            memory: "128Mi"
-            cpu: "100m"
+            memory: "100Mi"
+            cpu: "150m"
