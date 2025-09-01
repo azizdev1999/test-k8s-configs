@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pebble-falcon-prometheus-server
+  namespace: pebble-falcon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pebble-falcon-prometheus-server
+  template:
+    metadata:
+      labels:
+        app: pebble-falcon-prometheus-server
+    spec:
+      containers:
+      - name: prometheus
+        image: prom/prometheus:v2.45.0
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"

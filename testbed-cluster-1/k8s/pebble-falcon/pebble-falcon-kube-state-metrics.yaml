@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pebble-falcon-kube-state-metrics
+  namespace: pebble-falcon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pebble-falcon-kube-state-metrics
+  template:
+    metadata:
+      labels:
+        app: pebble-falcon-kube-state-metrics
+    spec:
+      containers:
+      - name: kube-state-metrics
+        image: k8s.gcr.io/kube-state-metrics/kube-state-metrics:v2.9.2
+        resources:
+          requests:
+            memory: "150Mi"
+            cpu: "100m"
+          limits:
+            memory: "250Mi"
+            cpu: "200m"

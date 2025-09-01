@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gmp-operator
+  namespace: gmp-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gmp-operator
+  template:
+    metadata:
+      labels:
+        app: gmp-operator
+    spec:
+      containers:
+      - name: gmp-operator
+        image: gmp-operator:latest
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"

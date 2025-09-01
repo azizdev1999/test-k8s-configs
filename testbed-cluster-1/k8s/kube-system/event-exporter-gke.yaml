@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-exporter-gke
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: event-exporter-gke
+  template:
+    metadata:
+      labels:
+        app: event-exporter-gke
+    spec:
+      containers:
+      - name: event-exporter
+        image: k8s.gcr.io/event-exporter:v1.0
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"

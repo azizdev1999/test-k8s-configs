@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gpu-operator
+  namespace: gpu-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gpu-operator
+  template:
+    metadata:
+      labels:
+        app: gpu-operator
+    spec:
+      containers:
+      - name: gpu-operator
+        image: nvidia/gpu-operator:v1.11.1
+        resources:
+          requests:
+            memory: "100Mi"
+            cpu: "200m"
+          limits:
+            memory: "350Mi"
+            cpu: "500m"

@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gmp-system
+  namespace: gmp-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gmp-system
+  template:
+    metadata:
+      labels:
+        app: gmp-system
+    spec:
+      containers:
+      - name: gmp-system
+        image: gmp-system:latest
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"

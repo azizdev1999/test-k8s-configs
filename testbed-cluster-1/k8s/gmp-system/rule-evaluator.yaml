@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rule-evaluator
+  namespace: gmp-system
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: rule-evaluator
+  template:
+    metadata:
+      labels:
+        app: rule-evaluator
+    spec:
+      containers:
+      - name: rule-evaluator
+        image: rule-evaluator:latest
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
