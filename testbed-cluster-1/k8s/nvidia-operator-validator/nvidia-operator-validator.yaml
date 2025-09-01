@@ -15,10 +15,3 @@ spec:
       containers:
       - name: nvidia-operator-validator
         image: nvcr.io/nvidia/cloud-native/gpu-operator-validator:v1.11.1
-        resources:
-          limits:
-            cpu: "2"
-            memory: "2Gi"
-          requests:
-            cpu: "1"
-            memory: "1Gi"
