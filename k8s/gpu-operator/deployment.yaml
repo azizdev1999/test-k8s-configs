@@ -46,8 +46,8 @@ spec:
               fieldPath: spec.nodeName
         resources:
           requests:
-            memory: "256Mi"
-            cpu: "100m"
+            memory: "28Mi"
+            cpu: "10m"
           limits:
             memory: "512Mi"
             cpu: "3m"
