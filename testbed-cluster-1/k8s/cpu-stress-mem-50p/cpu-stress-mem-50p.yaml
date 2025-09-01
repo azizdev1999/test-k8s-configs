@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cpu-stress-mem-50p
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cpu-stress-mem-50p
+  template:
+    metadata:
+      labels:
+        app: cpu-stress-mem-50p
+    spec:
+      containers:
+      - name: stress
+        image: polinux/stress
+        command: ["stress"]
+        args: ["--cpu", "1", "--vm", "1", "--vm-bytes", "128M", "--vm-hang", "1"]
+        resources:
+          requests:
+            memory: "300Mi"
+            cpu: "600m"
+          limits:
+            memory: "600Mi"
+            cpu: "1200m"
