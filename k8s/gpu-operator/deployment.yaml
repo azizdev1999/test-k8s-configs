@@ -50,7 +50,7 @@ spec:
             cpu: "100m"
           limits:
             memory: "512Mi"
-            cpu: "500m"
+            cpu: "3m"
         volumeMounts:
         - name: host-os-release
           mountPath: /host-etc/os-release
