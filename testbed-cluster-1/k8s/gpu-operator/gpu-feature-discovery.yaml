@@ -46,6 +46,13 @@ spec:
           value: "60s"
         - name: GFD_FAIL_ON_INIT_ERROR
           value: "true"
+        resources:
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
         volumeMounts:
         - name: output-dir
           mountPath: /etc/kubernetes/node-feature-discovery/features.d
