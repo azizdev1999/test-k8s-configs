@@ -20,8 +20,8 @@ spec:
         args: ["--cpu", "1", "--vm", "1", "--vm-bytes", "128M", "--vm-hang", "1"]
         resources:
           requests:
-            memory: "300Mi"
-            cpu: "600m"
+            memory: "400Mi"
+            cpu: "800m"
           limits:
-            memory: "600Mi"
-            cpu: "1200m"
+            memory: "800Mi"
+            cpu: "1600m"
