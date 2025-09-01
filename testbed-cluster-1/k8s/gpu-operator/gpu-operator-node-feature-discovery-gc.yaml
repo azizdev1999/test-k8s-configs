@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gpu-operator-1754931724-node-feature-discovery-gc
+  namespace: gpu-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gpu-operator-node-feature-discovery-gc
+  template:
+    metadata:
+      labels:
+        app: gpu-operator-node-feature-discovery-gc
+    spec:
+      containers:
+      - name: node-feature-discovery-gc
+        image: k8s.gcr.io/nfd/node-feature-discovery:v0.12.1
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"

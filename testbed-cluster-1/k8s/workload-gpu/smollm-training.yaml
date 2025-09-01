@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smollm-training
+  namespace: workload-gpu
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: smollm-training
+  template:
+    metadata:
+      labels:
+        app: smollm-training
+    spec:
+      containers:
+      - name: smollm-train
+        image: huggingface/transformers-pytorch-gpu:latest
+        resources:
+          requests:
+            memory: "8Gi"
+            cpu: "4000m"
+            nvidia.com/gpu: "2"
+          limits:
+            memory: "16Gi"
+            cpu: "8000m"
+            nvidia.com/gpu: "2"

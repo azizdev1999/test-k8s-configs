@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube-dns-autoscaler
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kube-dns-autoscaler
+  template:
+    metadata:
+      labels:
+        app: kube-dns-autoscaler
+    spec:
+      containers:
+      - name: autoscaler
+        image: k8s.gcr.io/cpa/cluster-proportional-autoscaler:1.8.5
+        resources:
+          requests:
+            memory: "20Mi"
+            cpu: "20m"
+          limits:
+            memory: "50Mi"
+            cpu: "50m"

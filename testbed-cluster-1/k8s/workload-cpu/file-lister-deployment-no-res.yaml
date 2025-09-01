@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: file-lister-deployment-no-res
+  namespace: workload-cpu
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: file-lister-no-res
+  template:
+    metadata:
+      labels:
+        app: file-lister-no-res
+    spec:
+      containers:
+      - name: file-lister
+        image: busybox:latest
+        command: ["/bin/sh"]
+        args: ["-c", "while true; do ls -la /tmp; sleep 60; done"]
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "10m"
+          limits:
+            memory: "64Mi"
+            cpu: "50m"

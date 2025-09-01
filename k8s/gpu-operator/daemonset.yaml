@@ -1,0 +1,168 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nvidia-device-plugin-daemonset
+  namespace: gpu-operator-system
+  labels:
+    app: nvidia-device-plugin
+    app.kubernetes.io/name: nvidia-device-plugin
+    app.kubernetes.io/component: device-plugin
+spec:
+  selector:
+    matchLabels:
+      app: nvidia-device-plugin
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: nvidia-device-plugin
+        app.kubernetes.io/name: nvidia-device-plugin
+        app.kubernetes.io/component: device-plugin
+    spec:
+      tolerations:
+      - key: nvidia.com/gpu
+        operator: Exists
+        effect: NoSchedule
+      - key: node.kubernetes.io/not-ready
+        operator: Exists
+        effect: NoSchedule
+      - key: node.kubernetes.io/unreachable
+        operator: Exists
+        effect: NoSchedule
+      priorityClassName: system-node-critical
+      containers:
+      - name: nvidia-device-plugin-ctr
+        image: nvcr.io/nvidia/k8s-device-plugin:v0.14.3
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: FAIL_ON_INIT_ERROR
+          value: "false"
+        - name: NVIDIA_VISIBLE_DEVICES
+          value: "all"
+        - name: NVIDIA_DRIVER_CAPABILITIES
+          value: "compute,utility"
+        - name: NVIDIA_REQUIRE_CUDA
+          value: "cuda>=11.0"
+        - name: NVIDIA_MIG_MONITOR_DEVICES
+          value: "all"
+        securityContext:
+          capabilities:
+            drop:
+            - ALL
+          allowPrivilegeEscalation: false
+        volumeMounts:
+        - name: device-plugin
+          mountPath: /var/lib/kubelet/device-plugins
+        - name: dev
+          mountPath: /dev
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "50Mi"
+          limits:
+            cpu: "100m"
+            memory: "128Mi"
+      volumes:
+      - name: device-plugin
+        hostPath:
+          path: /var/lib/kubelet/device-plugins
+      - name: dev
+        hostPath:
+          path: /dev
+      nodeSelector:
+        nvidia.com/gpu.present: "true"
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nvidia-dcgm-exporter
+  namespace: gpu-operator-system
+  labels:
+    app: nvidia-dcgm-exporter
+    app.kubernetes.io/name: nvidia-dcgm-exporter
+    app.kubernetes.io/component: metrics
+spec:
+  selector:
+    matchLabels:
+      app: nvidia-dcgm-exporter
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: nvidia-dcgm-exporter
+        app.kubernetes.io/name: nvidia-dcgm-exporter
+        app.kubernetes.io/component: metrics
+    spec:
+      tolerations:
+      - key: nvidia.com/gpu
+        operator: Exists
+        effect: NoSchedule
+      serviceAccountName: nvidia-dcgm-exporter
+      containers:
+      - name: nvidia-dcgm-exporter
+        image: nvcr.io/nvidia/k8s/dcgm-exporter:3.3.0-3.2.0-ubuntu22.04
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: DCGM_EXPORTER_KUBERNETES
+          value: "true"
+        - name: DCGM_EXPORTER_LISTEN
+          value: ":9400"
+        - name: DCGM_EXPORTER_INTERVAL
+          value: "30000"
+        ports:
+        - containerPort: 9400
+          name: metrics
+          protocol: TCP
+        securityContext:
+          runAsNonRoot: false
+          runAsUser: 0
+          capabilities:
+            add:
+            - SYS_ADMIN
+        volumeMounts:
+        - name: pod-gpu-resources
+          mountPath: /var/lib/kubelet/pod-resources
+          readOnly: true
+        - name: dev
+          mountPath: /dev
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+      volumes:
+      - name: pod-gpu-resources
+        hostPath:
+          path: /var/lib/kubelet/pod-resources
+      - name: dev
+        hostPath:
+          path: /dev
+      nodeSelector:
+        nvidia.com/gpu.present: "true"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nvidia-dcgm-exporter
+  namespace: gpu-operator-system
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nvidia-dcgm-exporter
+  namespace: gpu-operator-system
+  labels:
+    app: nvidia-dcgm-exporter
+spec:
+  selector:
+    app: nvidia-dcgm-exporter
+  ports:
+  - name: metrics
+    port: 9400
+    targetPort: 9400
+    protocol: TCP
+  type: ClusterIP

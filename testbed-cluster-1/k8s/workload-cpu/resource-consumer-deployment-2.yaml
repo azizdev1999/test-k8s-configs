@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resource-consumer-deployment-2
+  namespace: workload-cpu
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: resource-consumer-2
+  template:
+    metadata:
+      labels:
+        app: resource-consumer-2
+    spec:
+      containers:
+      - name: resource-consumer
+        image: k8s.gcr.io/e2e-test-images/resource-consumer:1.10
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"

@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: gpu-feature-discovery
+  namespace: gpu-operator
+spec:
+  selector:
+    matchLabels:
+      app: gpu-feature-discovery
+  template:
+    metadata:
+      labels:
+        app: gpu-feature-discovery
+    spec:
+      containers:
+      - name: gpu-feature-discovery
+        image: nvcr.io/nvidia/gpu-feature-discovery:v0.6.2
+        resources:
+          limits:
+            cpu: 26m
+            memory: 160Mi
+          requests:
+            cpu: 20m
+            memory: 124Mi

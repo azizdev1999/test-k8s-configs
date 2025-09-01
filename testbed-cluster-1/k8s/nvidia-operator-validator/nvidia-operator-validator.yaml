@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nvidia-operator-validator
+  namespace: gpu-operator
+spec:
+  selector:
+    matchLabels:
+      app: nvidia-operator-validator
+  template:
+    metadata:
+      labels:
+        app: nvidia-operator-validator
+    spec:
+      containers:
+      - name: nvidia-operator-validator
+        image: nvcr.io/nvidia/cloud-native/gpu-operator-validator:v1.11.1

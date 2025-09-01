@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pebble-falcon-opencost
+  namespace: pebble-falcon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pebble-falcon-opencost
+  template:
+    metadata:
+      labels:
+        app: pebble-falcon-opencost
+    spec:
+      containers:
+      - name: opencost
+        image: quay.io/kubecost1/opencost:latest
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"

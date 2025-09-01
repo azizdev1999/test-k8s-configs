@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: konnectivity-agent-autoscaler
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: konnectivity-agent-autoscaler
+  template:
+    metadata:
+      labels:
+        app: konnectivity-agent-autoscaler
+    spec:
+      containers:
+      - name: autoscaler
+        image: k8s.gcr.io/cpa/cluster-proportional-autoscaler:1.8.5
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "20m"
+          limits:
+            memory: "64Mi"
+            cpu: "50m"

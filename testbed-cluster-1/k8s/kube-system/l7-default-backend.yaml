@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: l7-default-backend
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: l7-default-backend
+  template:
+    metadata:
+      labels:
+        app: l7-default-backend
+    spec:
+      containers:
+      - name: default-backend
+        image: k8s.gcr.io/defaultbackend-amd64:1.5
+        resources:
+          requests:
+            memory: "10Mi"
+            cpu: "10m"
+          limits:
+            memory: "20Mi"
+            cpu: "20m"
