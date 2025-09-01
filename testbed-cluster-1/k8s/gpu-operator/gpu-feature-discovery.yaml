@@ -46,7 +46,6 @@ spec:
           value: "60s"
         - name: GFD_FAIL_ON_INIT_ERROR
           value: "true"
-        # Resources will be added by PR-Ops
         volumeMounts:
         - name: output-dir
           mountPath: /etc/kubernetes/node-feature-discovery/features.d
