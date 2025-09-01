@@ -15,3 +15,10 @@ spec:
       containers:
       - name: gpu-feature-discovery
         image: nvcr.io/nvidia/gpu-feature-discovery:v0.6.2
+        resources:
+          limits:
+            cpu: 26m
+            memory: 160Mi
+          requests:
+            cpu: 20m
+            memory: 124Mi
