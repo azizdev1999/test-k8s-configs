@@ -19,10 +19,10 @@ spec:
         resources:
           requests:
             memory: "256Mi"
-            cpu: "500m"
+            cpu: "1200m"
           limits:
             memory: "512Mi"
-            cpu: "1000m"
+            cpu: "1500m"
         ports:
         - containerPort: 8080
           name: http
@@ -35,7 +35,7 @@ spec:
         image: pebble/cpu-stress:v2.0.0
         resources:
           requests:
-            memory: "512Mi"
+            memory: "591Mi"
             cpu: "2399m"
           limits:
             memory: "1024Mi"
